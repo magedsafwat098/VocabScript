@@ -1,0 +1,16 @@
+# Never commit these
+*.key
+*.env
+secrets/
+config.js  
+
+# Chrome extension build files
+*.crx
+*.pem
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/

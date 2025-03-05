@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VocabScript</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      width: 350px;
+      margin: 0;
+      padding: 15px;
+      background-color: #f5f9ff;
+      color: #333;
+    }
+    
+    h1 {
+      color: #0055cc;
+      font-size: 24px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    
+    h2 {
+      color: #0066dd;
+      font-size: 18px;
+      margin-top: 20px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #0066dd;
+    }
+    
+    .api-section {
+      max-height: 500px;
+      overflow: hidden;
+      transition: all 0.3s ease-in-out;
+    }
+    
+    .api-section.collapsed {
+      max-height: 0;
+      opacity: 0;
+    }
+    
+    .api-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    
+    #toggleApi {
+      padding: 2px 8px;
+      font-size: 12px;
+      margin-left: 10px;
+      background: none;
+      border: none;
+      color: #0066dd;
+    }
+    
+    .api-key-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+    
+    #apiKeyInput {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    
+    .btn-save {
+      background-color: #00cc66;
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .status-message {
+      font-size: 12px;
+      margin-top: 5px;
+      min-height: 18px;
+    }
+    
+    .input-group {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    
+    #wordInput {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px 0 0 4px;
+      font-size: 14px;
+    }
+    
+    #translateButton {
+      background-color: #0066dd;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      cursor: pointer;
+      border-radius: 0 4px 4px 0;
+      font-weight: bold;
+    }
+    
+    #translateButton:hover {
+      background-color: #0055cc;
+    }
+    
+    .action-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+    
+    .btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    
+    .btn-download {
+      background-color: #0099ff;
+      color: white;
+    }
+    
+    .btn-download:hover {
+      background-color: #0088ee;
+    }
+    
+    .btn-clear {
+      background-color: #ff5555;
+      color: white;
+    }
+    
+    .btn-clear:hover {
+      background-color: #ee4444;
+    }
+    
+    #translationList {
+      list-style-type: none;
+      padding: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    #translationList li {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    #translationList li:nth-child(odd) {
+      background-color: #e8f0ff;
+    }
+    
+    .delete-btn {
+      color: #ff3333;
+      font-size: 16px;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      border-radius: 50%;
+      cursor: pointer;
+      margin-left: 8px;
+      background-color: rgba(255, 0, 0, 0.1);
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .delete-btn:hover {
+      background-color: rgba(255, 0, 0, 0.2);
+      transform: scale(1.1);
+    }
+    
+    .translation-text {
+      flex-grow: 1;
+      margin-right: 10px;
+    }
+    
+    .settings {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #e8f0ff;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .checkbox-container input[type="checkbox"] {
+      margin-right: 8px;
+    }
+    
+    .footer {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .developer {
+      font-weight: bold;
+      color: #0066dd;
+    }
+    
+    .empty-message {
+      text-align: center;
+      font-style: italic;
+      color: #888;
+      padding: 15px;
+    }
+    
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>VocabScript</h1>
+
+  <!-- API Settings Section -->
+  <div class="settings">
+    <div class="api-header" id="apiHeader">
+      <h2>API Settings</h2>
+      <button id="toggleApi" class="btn btn-save">▲</button>
+    </div>
+    <div id="apiSection" class="api-section">
+      <div class="api-key-group">
+        <input type="text" id="apiKeyInput" placeholder="Paste Google API Key Here">
+        <button id="saveApiKey" class="btn btn-save">Save Key</button>
+      </div>
+      <div id="keyStatus" class="status-message"></div>
+    </div>
+  </div>
+
+  <!-- Translation Input -->
+  <div class="input-group">
+    <input type="text" id="wordInput" placeholder="Enter a word to translate">
+    <button id="translateButton">Translate</button>
+  </div>
+
+  <!-- Auto-Download Setting -->
+  <div class="settings">
+    <div class="checkbox-container">
+      <input type="checkbox" id="autoDownloadOption" checked>
+      <label for="autoDownloadOption">Automatically update translations file</label>
+    </div>
+  </div>
+
+  <!-- Translations List -->
+  <h2>Saved Translations</h2>
+  <ul id="translationList" class="hide-scrollbar">
+    <!-- Dynamically populated -->
+  </ul>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button id="downloadButton" class="btn btn-download">Download Translations</button>
+    <button id="clearButton" class="btn btn-clear">Clear All</button>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    Developed with <span style="color:#ff3366;">&hearts;</span> by <span class="developer">Maged Safwat</span>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
